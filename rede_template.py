@@ -2,7 +2,9 @@
 Teste: implementação de uma rede neural já treinada (propagação direta)
 Matemática Computacional - Prof. Dr. Alexsandro O. A.
 
-Nome(s): ____________________________________________
+Nome(s): 
+Rian Francielton Soares dos Santos
+Lia Costa Andrade
 
 Regras:
 - Use apenas Python, NumPy e pandas.
@@ -39,30 +41,32 @@ def normalizar(entrega_bruta, divisores):
     entrega_bruta = [distancia_km, peso_kg, urgencia, valor_declarado]
     Retorne o vetor x (tamanho 4) que entra na rede.
     """
-    raise NotImplementedError("normalizar")
+    return np.asarray(entrega_bruta, dtype=float) / np.asarray(divisores, dtype=float)
 
 
 def relu(z):
     """TODO: ReLU(z) = max(0, z), elemento a elemento."""
-    raise NotImplementedError("relu")
+    return np.maximum(0.0, z)
 
 
 def tanh(z):
     """TODO: tangente hiperbólica, elemento a elemento (pode usar np.tanh)."""
-    raise NotImplementedError("tanh")
-
+    return np.tanh(z)
 
 def softmax(z):
     """TODO: softmax(z)_i = exp(z_i - max(z)) / soma_j exp(z_j - max(z)).
 
     Subtrair max(z) não muda o resultado e evita overflow.
     """
-    raise NotImplementedError("softmax")
+    exp_z = np.exp(z - np.max(z))
+    return exp_z / np.sum(exp_z)
 
 
 def camada(W, b, x, ativacao):
     """TODO: devolva (z, h), com z = W @ x + b e h = ativacao(z)."""
-    raise NotImplementedError("camada")
+    z = W @ x + b
+    h = ativacao(z)
+    return z, h
 
 
 def propagar(rede, x):
@@ -72,12 +76,24 @@ def propagar(rede, x):
     "z1", "h1", "z2", "h2", "z3", "p"  (p = probabilidades da saída).
     Ativações: camada 1 -> ReLU, camada 2 -> tanh, camada 3 -> softmax.
     """
-    raise NotImplementedError("propagar")
+    z1, h1 = camada(rede["W1"], rede["b1"], x, relu)
+    z2, h2 = camada(rede["W2"], rede["b2"], h1, tanh)
+    z3, p = camada(rede["W3"], rede["b3"], h2, softmax)
+    return {
+        "z1": z1,
+        "h1": h1,
+        "z2": z2,
+        "h2": h2,
+        "z3": z3,
+        "p": p,
+    }
 
 
 def classificar(rede, x):
     """TODO: devolva (nome_da_classe, probabilidade) da classe mais provável."""
-    raise NotImplementedError("classificar")
+    p = propagar(rede, x)["p"]
+    i = int(np.argmax(p))
+    return rede["classes"][i], float(p[i])
 
 
 # ---------------------------------------------------------------------------
